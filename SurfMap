@@ -1,0 +1,31 @@
+import requests as r
+from bs4 import BeautifulSoup as bs
+
+
+links = ['https://magicseaweed.com/The-Wall-Surf-Report/369/',
+         'https://magicseaweed.com/Long-Sands-Surf-Report/367/',
+         'https://magicseaweed.com/Rye-Rocks-Surf-Report/368/',
+         'https://magicseaweed.com/Jenness-Beach-Surf-Report/881/',
+         'https://magicseaweed.com/Long-Beach-Surf-Report/6342/',
+         'https://magicseaweed.com/Cape-Ann-Surf-Report/370/',
+         'https://magicseaweed.com/Revere-Beach-Surf-Report/5857/'
+         ]
+
+nums = list(range(0, len(links)))
+lineup = []
+for url in links:
+    ht = float(bs(r.get(url).content, 'html.parser').strong.string)
+    if ht < 2:
+        cond = 'Junk!'
+    elif ht < 4:
+        cond = 'Alright!'
+    elif ht >= 4:
+        cond = 'Wicked!'
+    else:
+        cond = 'Something went wrong af!'
+    lt = cond
+    lineup.append(lt)
+final = dict(zip(nums, lineup))
+print(final)
+
+ 
