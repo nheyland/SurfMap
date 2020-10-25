@@ -1,31 +1,69 @@
-import requests as r
 from bs4 import BeautifulSoup as bs
+import requests as r
+import folium as f
+
+spot = [['https://magicseaweed.com/Revere-Beach-Surf-Report/5857/', 42.42, -70.98],
+        ['https://magicseaweed.com/Rye-Rocks-Surf-Report/368/', 42.97, -70.77],
+        ['https://magicseaweed.com/Long-Sands-Surf-Report/367/', 43.16, -70.61],
+        ['https://magicseaweed.com/The-Wall-Surf-Report/369/', 43.02, -70.73],
+        ['https://magicseaweed.com/Jenness-Beach-Surf-Report/881/', 42.98, -70.76],
+        ['https://magicseaweed.com/Harbor-Beach-Surf-Report/7892/', 43.12, -70.64],
+        ['https://magicseaweed.com/Costellos-Surf-Report/2077/', 42.97, -70.83],
+        ['https://magicseaweed.com/Hampton-Beach-Surf-Report/2074/', 42.9, -70.81],
+        ['https://magicseaweed.com/Seabrook-Beach-Surf-Report/2078/', 42.88, -70.81],
+        ['https://magicseaweed.com/Salisbury-Surf-Report/1130/', 42.84, -70.81],
+        ['https://magicseaweed.com/Crane-Beach-Surf-Report/5864/', 42.68, -70.75],
+        ['https://magicseaweed.com/Cape-Ann-Surf-Report/370/', 42.60, -70.68],
+        ['https://magicseaweed.com/Devereux-Surf-Report/4792/', 42.49, -70.86]]
+
+green = '#31cc34'
+red = '#ed2213'
+blue = '#13c5ed'
+magenta = '#c113ed'
+gray = '#82807c'
+
+junk = 2
+alright = 5
+wicked = 8
 
 
-links = ['https://magicseaweed.com/The-Wall-Surf-Report/369/',
-         'https://magicseaweed.com/Long-Sands-Surf-Report/367/',
-         'https://magicseaweed.com/Rye-Rocks-Surf-Report/368/',
-         'https://magicseaweed.com/Jenness-Beach-Surf-Report/881/',
-         'https://magicseaweed.com/Long-Beach-Surf-Report/6342/',
-         'https://magicseaweed.com/Cape-Ann-Surf-Report/370/',
-         'https://magicseaweed.com/Revere-Beach-Surf-Report/5857/'
-         ]
+map = f.Map(location=[43.12, -70.64])
+for i in range(0, len(spot)):
+    link = spot[i][0]
+    lat = spot[i][1]
+    long = spot[i][2]
+    ht = float(bs(r.get(link).content, 'html.parser').strong.string)
+    name = bs(r.get(link).content, 'html.parser').find('h1').string
 
-nums = list(range(0, len(links)))
-lineup = []
-for url in links:
-    ht = float(bs(r.get(url).content, 'html.parser').strong.string)
-    if ht < 2:
+    if ht < junk:
         cond = 'Junk!'
-    elif ht < 4:
+        color = red
+    elif ht < alright:
         cond = 'Alright!'
-    elif ht >= 4:
+        color = blue
+    elif ht < wicked:
         cond = 'Wicked!'
+        color = green
+    elif ht >= wicked:
+        cond = 'Nuts!'
+        color = magenta
     else:
-        cond = 'Something went wrong af!'
-    lt = cond
-    lineup.append(lt)
-final = dict(zip(nums, lineup))
-print(final)
+        cond = 'Something went wrong!'
+        color = gray
 
- 
+    print(name)
+    print(link)
+    print(lat)
+    print(long)
+    print(cond)
+
+    f.CircleMarker(
+        location=(lat, long),
+        radius=25,
+        popup=name,
+        color=color,
+        fill=True,
+        fill_color=color
+    ).add_to(map)
+
+map.save('SurfMap.html')
